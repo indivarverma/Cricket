@@ -11,6 +11,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.indivar.core.viewmodels.MatchDetailViewModel
 import com.indivar.core.viewmodels.MatchDetailsEffect
@@ -20,15 +21,16 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
 @Composable
 fun MatchDetailViewScreen(navigationController: NavHostController, matchId: Int) {
+    val matchDetailViewModel: MatchDetailViewModel = hiltViewModel()
     var dialogState by remember {
         mutableStateOf(false)
     }
-
 
     @Composable
     fun <T> Flow<T>.collectAsEffect(
@@ -40,7 +42,7 @@ fun MatchDetailViewScreen(navigationController: NavHostController, matchId: Int)
         }
     }
 
-    fun MatchDetailsEffect.consume() {
+    fun MatchDetailsEffect.consume(): Any =
         when (this) {
             is MatchDetailsEffect.ToastNow -> {
                 dialogState = true
@@ -50,28 +52,20 @@ fun MatchDetailViewScreen(navigationController: NavHostController, matchId: Int)
                 navigationController.navigate(Screen.PlayerDetailScreen.route)
 
             is MatchDetailsEffect.Ready -> {
-                this.triggerFetch(matchId)
+                matchDetailViewModel.viewModelScope.launch {
+                    this@consume.triggerFetch(matchId)
+                }
             }
 
-            else -> {
 
-            }
         }
 
-    }
 
-
-    val matchDetailViewModel: MatchDetailViewModel = hiltViewModel()
     val state = matchDetailViewModel.viewState.collectAsState(MatchViewState.initial).value
     matchDetailViewModel.effects.collectAsEffect(context = Dispatchers.Main, block = {
         it.forEach(MatchDetailsEffect::consume)
     })
 
-    /*LaunchedEffect(key1 = matchDetailViewModel.effects) {
-        matchDetailViewModel.effects.collect {
-            it.forEach(MatchDetailsEffect::consume)
-        }
-    }*/
     if (state.showLoading) {
         Text("Android Loading")
     } else {
