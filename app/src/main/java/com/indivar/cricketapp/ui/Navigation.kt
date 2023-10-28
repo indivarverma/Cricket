@@ -22,6 +22,7 @@ fun Navigation() {
         navController = navigationController,
         startDestination = Screen.MatchDetailScreen.route
     ) {
+
         composable(
             route = Screen.MatchDetailScreen.route,
             arguments = listOf(
@@ -30,13 +31,12 @@ fun Navigation() {
                     defaultValue = 2768819
                 }
             )
-        ) {
-            it.arguments?.getInt("matchId")?.let { matchId ->
+        ) { entry ->
+            entry.arguments?.getInt("matchId")?.let { matchId ->
                 MatchDetailViewScreen(navigationController, matchId)
             }
-
-
         }
+
         composable(
             route = Screen.PlayerDetailScreen.route,
             arguments = listOf(
@@ -45,7 +45,8 @@ fun Navigation() {
                 }
             )
         ) {
-            it.arguments?.getInt("playerId")?.let {playerId ->
+
+            it.arguments?.getInt("playerId")?.let { playerId ->
                 PlayerDetailViewScreen(navigationController, playerId)
             }
 

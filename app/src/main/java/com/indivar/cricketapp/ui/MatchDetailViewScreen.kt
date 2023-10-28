@@ -15,10 +15,13 @@ import androidx.navigation.NavHostController
 import com.indivar.core.viewmodels.MatchDetailViewModel
 import com.indivar.core.viewmodels.MatchDetailsEffect
 import com.indivar.core.viewmodels.MatchViewState
-import dagger.Module
-import dagger.Provides
-import dagger.hilt.InstallIn
-import dagger.hilt.android.components.ViewModelComponent
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.EmptyCoroutineContext
 
 @Composable
 fun MatchDetailViewScreen(navigationController: NavHostController, matchId: Int) {
@@ -26,6 +29,16 @@ fun MatchDetailViewScreen(navigationController: NavHostController, matchId: Int)
         mutableStateOf(false)
     }
 
+
+    @Composable
+    fun <T> Flow<T>.collectAsEffect(
+        context: CoroutineContext = EmptyCoroutineContext,
+        block: (T) -> Unit
+    ) {
+        LaunchedEffect(key1 = Unit) {
+            onEach(block).flowOn(context).launchIn(this)
+        }
+    }
 
     fun MatchDetailsEffect.consume() {
         when (this) {
@@ -39,6 +52,7 @@ fun MatchDetailViewScreen(navigationController: NavHostController, matchId: Int)
             is MatchDetailsEffect.Ready -> {
                 this.triggerFetch(matchId)
             }
+
             else -> {
 
             }
@@ -47,16 +61,17 @@ fun MatchDetailViewScreen(navigationController: NavHostController, matchId: Int)
     }
 
 
-
     val matchDetailViewModel: MatchDetailViewModel = hiltViewModel()
     val state = matchDetailViewModel.viewState.collectAsState(MatchViewState.initial).value
+    matchDetailViewModel.effects.collectAsEffect(context = Dispatchers.Main, block = {
+        it.forEach(MatchDetailsEffect::consume)
+    })
 
-
-    LaunchedEffect(key1 = matchDetailViewModel.effects) {
+    /*LaunchedEffect(key1 = matchDetailViewModel.effects) {
         matchDetailViewModel.effects.collect {
             it.forEach(MatchDetailsEffect::consume)
         }
-    }
+    }*/
     if (state.showLoading) {
         Text("Android Loading")
     } else {
