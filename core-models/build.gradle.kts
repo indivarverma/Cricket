@@ -9,5 +9,5 @@ java {
 }
 
 dependencies {
-    implementation(ApiDependencies.joda_time)
+    implementation("joda-time:joda-time:2.9.4")
   }
