@@ -5,6 +5,7 @@ import com.facebook.flipper.plugins.network.FlipperOkhttpInterceptor
 import com.facebook.flipper.plugins.network.NetworkFlipperPlugin
 import com.google.gson.JsonObject
 import com.google.gson.JsonParser
+import com.indivar.usecases.DetailedServerError
 import com.indivar.usecases.Repository
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -40,16 +41,18 @@ class RetrofitHandler {
     }
 
     @Provides
-    fun createRepository(repository: RepositoryImpl) : Repository {
+    fun createRepository(repository: RepositoryImpl): Repository {
         return repository
     }
+
     @Provides
     fun createApiEndpoint(retrofit: Retrofit): NetworkApi {
         return retrofit.create(NetworkApi::class.java)
     }
 
     @Provides
-    fun createCoroutineDispatcher(): CoroutineDispatcher  = Dispatchers.IO
+    fun createCoroutineDispatcher(): CoroutineDispatcher = Dispatchers.IO
+
     @Provides
     fun createRetrofit(
         networkFlipperInterceptor: Interceptor,

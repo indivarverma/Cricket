@@ -1,6 +1,7 @@
 package com.indivar.core.viewmodels
 
 import androidx.lifecycle.ViewModel
+import com.indivar.core.Response
 import com.indivar.models.Match
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -24,7 +25,12 @@ class MatchDetailViewModel
     private suspend fun fetch() {
         _state.update { prevState ->
             val result = pullMatchDetailsUseCase.invoke(matchId = prevState.matchId)
-            prevState.copy(data = result?.let { PullState.Pulled(result) } ?: PullState.Failed)
+            prevState.copy(
+                data = when (result) {
+                    is Response.Success -> PullState.Pulled(result.data)
+                    is Response.Error -> PullState.Failed
+                }
+            )
 
         }
     }
@@ -33,8 +39,13 @@ class MatchDetailViewModel
 
         val result = pullMatchDetailsUseCase.invoke(id)
         _state.update { prevState ->
-            prevState.copy(matchId = id,
-                data = result?.let { PullState.Pulled(result) } ?: PullState.Failed).also {
+            prevState.copy(
+                matchId = id,
+                data = when (result) {
+                    is Response.Success -> PullState.Pulled(result.data)
+                    is Response.Error -> PullState.Failed
+                }
+            ).also {
                 onSuccess()
 
             }
@@ -43,7 +54,11 @@ class MatchDetailViewModel
     }
 
     private fun mapState(state: MatchDetailState): MatchViewState =
-        MatchViewState(showLoading = state.data is PullState.Loading, refetch = ::fetch)
+        MatchViewState(
+            showLoading = state.data is PullState.Loading,
+            showError = state.data is PullState.Failed,
+            refetch = ::fetch
+        )
 
     data class MatchDetailState(
         val matchId: Int,

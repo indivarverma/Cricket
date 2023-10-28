@@ -71,6 +71,9 @@ fun MatchDetailViewScreen(navigationController: NavHostController, matchId: Int)
     } else {
         Text("Android Loaded")
     }
+    if (state.showError) {
+        Text("Encountered Error")
+    }
     if (dialogState) {
         AlertDialog(
             title = { Text(text = "Trial alert") },

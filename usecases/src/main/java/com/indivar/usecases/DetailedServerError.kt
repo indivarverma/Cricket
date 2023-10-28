@@ -1,4 +1,4 @@
-package com.indivar.repository
+package com.indivar.usecases
 
 data class DetailedServerError(
     val errorCode: Int,
