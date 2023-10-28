@@ -1,15 +1,20 @@
 package com.indivar.core.viewmodels
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.indivar.core.Response
 import com.indivar.models.Match
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 
 @HiltViewModel
@@ -35,22 +40,29 @@ class MatchDetailViewModel
         }
     }
 
-    private suspend fun fetch(id: Int, onSuccess: () -> Unit = {}) {
-
-        val result = pullMatchDetailsUseCase.invoke(id)
-        _state.update { prevState ->
-            prevState.copy(
+    private fun fetch(id: Int, onSuccess: () -> Unit = {}) {
+        viewModelScope.launch {
+            val result = withTimeoutOrNull(5000) {
+                withContext(Dispatchers.IO) {
+                    pullMatchDetailsUseCase.invoke(id)
+                }
+            } ?: Response.Error(errorCode = 404, errorMessage = "Timed Out")
+            _state.value = _state.value.copy(
                 matchId = id,
                 data = when (result) {
-                    is Response.Success -> PullState.Pulled(result.data)
+                    is Response.Success -> PullState.Pulled(result.data).also {
+                        onSuccess()
+                    }
                     is Response.Error -> PullState.Failed
                 }
-            ).also {
-                onSuccess()
-
-            }
+            )
         }
+    }
 
+    private fun onClick() {
+        _state.update {
+            it
+        }
     }
 
     private fun mapState(state: MatchDetailState): MatchViewState =

@@ -11,7 +11,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewModelScope
 import androidx.navigation.NavHostController
 import com.indivar.core.viewmodels.MatchDetailViewModel
 import com.indivar.core.viewmodels.MatchDetailsEffect
@@ -21,7 +20,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.launch
 import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
@@ -52,9 +50,7 @@ fun MatchDetailViewScreen(navigationController: NavHostController, matchId: Int)
                 navigationController.navigate(Screen.PlayerDetailScreen.route)
 
             is MatchDetailsEffect.Ready -> {
-                matchDetailViewModel.viewModelScope.launch {
-                    this@consume.triggerFetch(matchId)
-                }
+                this@consume.triggerFetch(matchId)
             }
 
 

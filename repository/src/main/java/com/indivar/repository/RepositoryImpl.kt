@@ -21,10 +21,10 @@ import com.indivar.models.Team as ModelsTeam
 
 class RepositoryImpl @Inject constructor(
     private val networkApi: NetworkApi,
-    private val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : Repository {
     override suspend fun pullMatchDetails(matchId: Int): Match? {
-        return withContext(ioDispatcher) {
+        return withContext(defaultDispatcher) {
             val v = networkApi.getMatchDetails(matchId)
             v.match
         }
