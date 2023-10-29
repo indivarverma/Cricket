@@ -7,7 +7,7 @@ sealed class MatchDetailsEffect {
     ): MatchDetailsEffect()
     object ToastNow: MatchDetailsEffect()
     data class CheckPlayerDetails(
-        val playerId: String,
+        val playerId: Int,
     ): MatchDetailsEffect()
 
 }

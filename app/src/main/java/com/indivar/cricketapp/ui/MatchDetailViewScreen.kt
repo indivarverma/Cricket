@@ -1,5 +1,7 @@
 package com.indivar.cricketapp.ui
 
+import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.AlertDialog
@@ -13,12 +15,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.navigation.NavHostController
 import com.indivar.core.viewmodels.MatchDetailViewModel
 import com.indivar.core.viewmodels.MatchDetailsEffect
 import com.indivar.core.viewmodels.MatchViewState
@@ -31,12 +33,17 @@ import kotlin.coroutines.CoroutineContext
 import kotlin.coroutines.EmptyCoroutineContext
 
 @Composable
-fun MatchDetailViewScreen(navigationController: NavHostController, matchId: Int) {
+fun MatchDetailViewScreen(
+    matchId: Int,
+    onPlayerSelected: (Int) -> Unit,
+    finish: () -> Unit,
+) {
     val matchDetailViewModel: MatchDetailViewModel = hiltViewModel()
+    val finishRef by rememberUpdatedState(newValue = finish)
+
     var dialogState by remember {
         mutableStateOf(false)
     }
-
     val coroutineScope = rememberCoroutineScope()
 
     @Composable
@@ -57,7 +64,7 @@ fun MatchDetailViewScreen(navigationController: NavHostController, matchId: Int)
             }
 
             is MatchDetailsEffect.CheckPlayerDetails ->
-                navigationController.navigate(Screen.PlayerDetailScreen.route)
+                onPlayerSelected(playerId)
 
             is MatchDetailsEffect.Ready -> {
                 this@consume.triggerFetch(matchId)
@@ -86,10 +93,18 @@ fun MatchDetailViewScreen(navigationController: NavHostController, matchId: Int)
             onDismissRequest = {
                 dialogState = false
             }, confirmButton = {
-                Button(onClick = { dialogState = false }) {
+                Button(onClick = {
+                    finishRef()
+                    dialogState = false
+                }) {
                     Text(text = "Okay")
                 }
             })
+    }
+    BackHandler {
+        dialogState = true
+
+        Log.d("Indivar", "Back button Pressed^^^^^^^^^^^")
     }
 }
 

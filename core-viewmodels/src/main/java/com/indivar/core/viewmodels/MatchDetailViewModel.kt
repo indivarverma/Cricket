@@ -17,7 +17,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class MatchDetailViewModel
-@Inject constructor(private val pullMatchDetailsUseCase: PullMatchDetailsUseCase) : ViewModel() {
+@Inject constructor(
+    private val pullMatchDetailsUseCase: PullMatchDetailsUseCase,
+) : ViewModel() {
     private val _state =
         MutableStateFlow(MatchDetailState(matchId = null, data = PullState.Loading))
     private val _effects = MutableSharedFlow<List<MatchDetailsEffect>>()
@@ -88,6 +90,7 @@ class MatchDetailViewModel
                 info = null,
                 refetch = ::fetch
             )
+
             is PullState.Loading -> MatchViewState(
                 showLoading = true,
                 showError = false,
