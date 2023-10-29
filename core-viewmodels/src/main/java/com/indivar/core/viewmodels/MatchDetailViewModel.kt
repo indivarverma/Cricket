@@ -17,7 +17,8 @@ import javax.inject.Inject
 @HiltViewModel
 class MatchDetailViewModel
 @Inject constructor(private val pullMatchDetailsUseCase: PullMatchDetailsUseCase) : ViewModel() {
-    private val _state = MutableStateFlow(MatchDetailState(matchId = 0, data = PullState.Loading))
+    private val _state =
+        MutableStateFlow(MatchDetailState(matchId = null, data = PullState.Loading))
     private val _effects = MutableSharedFlow<List<MatchDetailsEffect>>()
 
     val viewState: Flow<MatchViewState> = _state.map(::mapState)
@@ -26,16 +27,18 @@ class MatchDetailViewModel
 
     private suspend fun fetch() {
         _state.update { prevState ->
-            val result = pullMatchDetailsUseCase.trigger(matchId = prevState.matchId)
+            val result = prevState.matchId?.let { pullMatchDetailsUseCase.trigger(matchId = it) }
             prevState.copy(
                 data = when (result) {
                     is Response.Success -> PullState.Pulled(result.data)
                     is Response.Error -> PullState.Failed
+                    null -> PullState.Failed
                 }
             )
 
         }
     }
+
 
     private fun fetch(id: Int, onSuccess: () -> Unit = {}) {
         viewModelScope.launch {
@@ -46,6 +49,7 @@ class MatchDetailViewModel
                     is Response.Success -> PullState.Pulled(matchDetail.data).also {
                         onSuccess()
                     }
+
                     is Response.Error -> PullState.Failed
                 }
             )
@@ -60,7 +64,7 @@ class MatchDetailViewModel
         )
 
     data class MatchDetailState(
-        val matchId: Int,
+        val matchId: Int?,
         val data: PullState,
     )
 
