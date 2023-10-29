@@ -14,7 +14,10 @@ import com.indivar.models.ScoreCard
 import com.indivar.usecases.Repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.withTimeout
+import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 import com.indivar.models.Team as ModelsTeam
 
@@ -25,8 +28,10 @@ class RepositoryImpl @Inject constructor(
 ) : Repository {
     override suspend fun pullMatchDetails(matchId: Int): Match? {
         return withContext(defaultDispatcher) {
-            val v = networkApi.getMatchDetails(matchId)
-            v.match
+            withTimeoutOrNull(5000) {
+                val v = networkApi.getMatchDetails(matchId)
+                v.match
+            }
         }
 
     }

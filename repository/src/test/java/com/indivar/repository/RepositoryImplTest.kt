@@ -18,23 +18,29 @@ class RepositoryImplTest {
     private lateinit var networkApi: NetworkApi
     private lateinit var matchDetail: MatchDetail
 
+
     @Before
     fun init() {
         matchDetail = FakeData.fakeMatchDetail1
         networkApi = mockk(relaxed = true) {
-            coEvery { getMatchDetails(any()) }.returns(matchDetail)
+            coEvery { getMatchDetails(any()) }.coAnswers {
+                matchDetail
+            }
         }
+
     }
 
     @Test
     fun `verify Match object is pulled correctly`() {
         runTest {
+            val testDispatcher = StandardTestDispatcher(testScheduler)
             val repository = RepositoryImpl(
                 networkApi,
-                StandardTestDispatcher(testScheduler)
+                testDispatcher
             )
 
             val match = repository.pullMatchDetails(1002)
+
             Assert.assertNotNull(match)
             Assert.assertEquals(match?.id, matchDetail.results?.fixture?.id)
             Assert.assertEquals(match?.seriesId, matchDetail.results?.fixture?.series_id)

@@ -9,7 +9,7 @@ import javax.inject.Inject
 class PullMatchDetailsUseCaseImpl @Inject constructor(
     private val networkRepository: Repository
 ) : PullMatchDetailsUseCase {
-    override suspend fun invoke(
+    override suspend fun trigger(
         id: Int
     ): Response<Match> = coroutineScope {
         try {

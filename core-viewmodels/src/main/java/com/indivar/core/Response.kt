@@ -1,7 +1,5 @@
 package com.indivar.core
 
-
-
 sealed class Response<T> {
     data class Success<T>(
         val data: T

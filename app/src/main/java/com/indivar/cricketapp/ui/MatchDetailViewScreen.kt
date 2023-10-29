@@ -4,12 +4,14 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.indivar.core.viewmodels.MatchDetailViewModel
@@ -30,13 +32,16 @@ fun MatchDetailViewScreen(navigationController: NavHostController, matchId: Int)
         mutableStateOf(false)
     }
 
+    val coroutineScope = rememberCoroutineScope()
+
     @Composable
     fun <T> Flow<T>.collectAsEffect(
         context: CoroutineContext = EmptyCoroutineContext,
         block: (T) -> Unit
     ) {
-        LaunchedEffect(key1 = Unit) {
-            onEach(block).flowOn(context).launchIn(this)
+        DisposableEffect(key1 = matchDetailViewModel.effects, key2 = LocalLifecycleOwner.current) {
+            val job = onEach(block).flowOn(context).launchIn(coroutineScope)
+            onDispose { job.cancel() }
         }
     }
 
