@@ -22,11 +22,12 @@ class MatchDetailViewModel
 ) : ViewModel() {
     private val _state =
         MutableStateFlow(MatchDetailState(matchId = null, data = PullState.Loading))
-    private val _effects = MutableSharedFlow<List<MatchDetailsEffect>>()
+    private val _effects = MutableSharedFlow<List<MatchDetailsEffect>>().onStart {
+        emit(listOf(MatchDetailsEffect.Ready(::fetch)))
+    }
 
     val viewState: Flow<MatchViewState> = _state.map(::mapState)
-    val effects: Flow<List<MatchDetailsEffect>> =
-        _effects.onStart { emit(listOf(MatchDetailsEffect.Ready(::fetch))) }
+    val effects: Flow<List<MatchDetailsEffect>> = _effects
 
     private suspend fun fetch() {
         _state.update { prevState ->

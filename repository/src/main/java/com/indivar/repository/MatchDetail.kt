@@ -1,6 +1,7 @@
 package com.indivar.repository
 
 
+import com.squareup.moshi.Json
 import java.time.ZonedDateTime
 
 data class MatchDetail(
@@ -9,9 +10,10 @@ data class MatchDetail(
 
 data class Results(
     val fixture: Fixture,
+    @Json(name = "live_details")
     val liveDetails: LiveDetails?,
-    val scorecard: List<MatchInning>?,
-)
+
+    )
 
 data class Fixture(
     val id: Int,
@@ -26,6 +28,7 @@ data class Fixture(
 data class LiveDetails(
     val match_summary: MatchSummary,
     val officials: Officials,
+    val scorecard: List<MatchInning>?,
 )
 
 data class MatchSummary(

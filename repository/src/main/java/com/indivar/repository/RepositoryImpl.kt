@@ -14,9 +14,7 @@ import com.indivar.models.ScoreCard
 import com.indivar.usecases.Repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeout
 import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 import com.indivar.models.Team as ModelsTeam
@@ -62,7 +60,7 @@ val MatchDetail.match: Match?
             homeTeamScores = this.results.liveDetails?.match_summary?.home_scores,
             awayTeamScores = this.results.liveDetails?.match_summary?.away_scores,
             matchOfficials = this.results.liveDetails?.officials?.matchOfficials,
-            scoreCard = this.results.scorecard?.let { ScoreCard(it.map { it.inning }) },
+            scoreCard = this.results.liveDetails?.scorecard?.let { ScoreCard(it.map { it.inning }) },
 
 
             )
