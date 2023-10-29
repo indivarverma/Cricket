@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @HiltViewModel
@@ -57,11 +58,44 @@ class MatchDetailViewModel
     }
 
     private fun mapState(state: MatchDetailState): MatchViewState =
-        MatchViewState(
-            showLoading = state.data is PullState.Loading,
-            showError = state.data is PullState.Failed,
-            refetch = ::fetch
-        )
+        when (val data = state.data) {
+            is PullState.Pulled -> MatchViewState(
+                showLoading = false,
+                showError = false,
+                info = MatchInformation(
+                    startDate = data.detail.matchDates?.start?.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                        ?: "",
+                    endDate = data.detail.matchDates?.end?.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)
+                        ?: "",
+                    title = data.detail.title,
+                    homeTeam = data.detail.homeTeam?.name ?: "",
+                    awayTeam = data.detail.awayTeams.getOrNull(0)?.name ?: "",
+                    result = data.detail.result,
+                    tossResult = data.detail.tossResult,
+                    homeTeamScores = data.detail.homeTeamScores,
+                    awayTeamScores = data.detail.awayTeamScores,
+                    firstEmpire = data.detail.matchOfficials?.firstUmpire,
+                    secondEmpire = data.detail.matchOfficials?.secondUmpire,
+                    thirdEmpire = data.detail.matchOfficials?.thirdUmpire,
+                    scoreCard = data.detail.scoreCard,
+                ),
+                refetch = ::fetch
+            )
+
+            is PullState.Failed -> MatchViewState(
+                showLoading = false,
+                showError = true,
+                info = null,
+                refetch = ::fetch
+            )
+            is PullState.Loading -> MatchViewState(
+                showLoading = true,
+                showError = false,
+                info = null,
+                refetch = ::fetch
+            )
+        }
+
 
     data class MatchDetailState(
         val matchId: Int?,
