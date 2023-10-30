@@ -7,9 +7,9 @@ import com.google.gson.JsonObject
 import com.google.gson.JsonParser
 import com.indivar.common.adapters.ZonedDateTimeAdapter
 import com.indivar.common.api.NetworkApi
+import com.indivar.domain.repo.Repository
 import com.indivar.domain.repo.RepositoryImpl
 import com.indivar.domain.usecases.DetailedServerError
-import com.indivar.domain.repo.Repository
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import dagger.Module

@@ -7,7 +7,6 @@ import com.indivar.core.Navigator
 import com.indivar.core.data.Response
 import com.indivar.core.series.list.domain.usecase.PullAllSeriesUseCase
 import com.indivar.models.series.AllSeries
-import com.indivar.models.series.Series
 import com.indivar.models.series.SeriesGroup
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow

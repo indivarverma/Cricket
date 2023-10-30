@@ -2,7 +2,6 @@ package com.indivar.core.series.list.domain.viewmodel
 
 
 import com.indivar.models.series.AllSeries
-import com.indivar.models.series.Series
 import com.indivar.models.series.SeriesGroup
 
 data class SeriesListViewState(

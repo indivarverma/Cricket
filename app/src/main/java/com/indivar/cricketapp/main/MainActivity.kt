@@ -7,10 +7,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.indivar.cricketapp.navigation.Navigation
 import com.indivar.core.Navigator
+import com.indivar.cricketapp.navigation.Navigation
 import com.indivar.cricketapp.ui.theme.CricketAppTheme
-import dagger.Binds
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

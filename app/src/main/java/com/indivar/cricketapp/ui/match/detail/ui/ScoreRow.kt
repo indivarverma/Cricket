@@ -11,8 +11,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.indivar.models.match.BattingMatchStat
 import com.indivar.models.Player
+import com.indivar.models.match.BattingMatchStat
 
 @Composable
 fun ScoreRow(
