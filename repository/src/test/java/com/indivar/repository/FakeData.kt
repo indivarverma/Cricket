@@ -1,5 +1,13 @@
 package com.indivar.repository
 
+import com.indivar.domain.repo.match.details.Fixture
+import com.indivar.domain.repo.match.details.LiveDetails
+import com.indivar.domain.repo.match.details.MatchDetail
+import com.indivar.domain.repo.match.details.MatchSummary
+import com.indivar.domain.repo.match.details.Officials
+import com.indivar.domain.repo.match.details.Results
+import com.indivar.domain.repo.match.details.Team
+
 object FakeData {
 
     val fakeMatchDetail1 = MatchDetail(
@@ -28,10 +36,9 @@ object FakeData {
                     umpire_tv = "Richard Kettleborough",
                     referee = "Andy Pycroft",
                     umpire_reserve = "Chris Gaffaney"
-                )
+                ),
+                scorecard = null,
             ),
-            scorecard = null
-
         )
     )
 }

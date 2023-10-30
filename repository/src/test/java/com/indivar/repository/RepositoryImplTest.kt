@@ -1,5 +1,8 @@
 package com.indivar.repository
 
+import com.indivar.common.api.NetworkApi
+import com.indivar.domain.repo.RepositoryImpl
+import com.indivar.domain.repo.match.details.MatchDetail
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
