@@ -1,15 +1,20 @@
 package com.indivar.core.viewmodels
 
+import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.indivar.core.Response
 import com.indivar.models.Match
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.onStart
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.time.format.DateTimeFormatter
@@ -18,29 +23,23 @@ import javax.inject.Inject
 @HiltViewModel
 class MatchDetailViewModel
 @Inject constructor(
+    savedStateHandle: SavedStateHandle,
     private val pullMatchDetailsUseCase: PullMatchDetailsUseCase,
 ) : ViewModel() {
+    private val matchId = checkNotNull(savedStateHandle.get<Int>("matchId"))
     private val _state =
         MutableStateFlow(MatchDetailState(matchId = null, data = PullState.Loading))
-    private val _effects = MutableSharedFlow<List<MatchDetailsEffect>>().onStart {
-        emit(listOf(MatchDetailsEffect.Ready(::fetch)))
+    private val _effects = MutableSharedFlow<List<MatchDetailsEffect>>()
+
+    init {
+        fetch(matchId)
     }
 
     val viewState: Flow<MatchViewState> = _state.map(::mapState)
-    val effects: Flow<List<MatchDetailsEffect>> = _effects
+    val effects: SharedFlow<List<MatchDetailsEffect>> = _effects.asSharedFlow()
 
     private suspend fun fetch() {
-        _state.update { prevState ->
-            val result = prevState.matchId?.let { pullMatchDetailsUseCase.trigger(matchId = it) }
-            prevState.copy(
-                data = when (result) {
-                    is Response.Success -> PullState.Pulled(result.data)
-                    is Response.Error -> PullState.Failed
-                    null -> PullState.Failed
-                }
-            )
-
-        }
+        fetch(matchId)
     }
 
 

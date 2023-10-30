@@ -1,5 +1,6 @@
 package com.indivar.repository
 
+import com.indivar.models.AllSeries
 import com.indivar.models.BattingMatchStat
 import com.indivar.models.Boundary
 import com.indivar.models.BoundaryType
@@ -11,6 +12,8 @@ import com.indivar.models.MatchOfficials
 import com.indivar.models.Overs
 import com.indivar.models.Player
 import com.indivar.models.ScoreCard
+import com.indivar.models.Series
+import com.indivar.models.SeriesGroup
 import com.indivar.usecases.Repository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -33,8 +36,38 @@ class RepositoryImpl @Inject constructor(
         }
 
     }
+
+    override suspend fun getAllSeries(): AllSeries? {
+        return withContext(defaultDispatcher) {
+            withTimeoutOrNull(20000) {
+                val v = networkApi.getAllSeries()
+                v.allSeries
+            }
+        }
+    }
 }
 
+
+val AllSeriesDetail.allSeries: AllSeries
+    get() = AllSeries(
+        title = this.meta.title,
+        description = this.meta.description,
+        seriesGroup = this.results.map { it.seriesGroup }
+    )
+
+val SeriesSet.seriesGroup: SeriesGroup
+    get() = SeriesGroup(
+        type = this.type,
+        series = this.items.map { it.series }
+    )
+
+val SeriesItem.series: Series
+    get() = Series(
+        id = this.id,
+        name = this.name,
+        status = this.status,
+        season = this.season,
+    )
 val Team.team: ModelsTeam
     get() = ModelsTeam(
         id = this.id,

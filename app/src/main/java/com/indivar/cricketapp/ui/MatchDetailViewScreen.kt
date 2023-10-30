@@ -1,6 +1,5 @@
 package com.indivar.cricketapp.ui
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -18,7 +17,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,32 +26,25 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.indivar.core.viewmodels.MatchDetailViewModel
 import com.indivar.core.viewmodels.MatchDetailsEffect
 import com.indivar.core.viewmodels.MatchInformation
 import com.indivar.core.viewmodels.MatchViewState
+import com.indivar.cricketapp.collectAsEffect
 import com.indivar.models.BattingMatchStat
 import com.indivar.models.Player
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlin.coroutines.CoroutineContext
-import kotlin.coroutines.EmptyCoroutineContext
 
 @Composable
 fun MatchDetailViewScreen(
-    matchId: Int,
+    matchDetailViewModel: MatchDetailViewModel,
     onPlayerSelected: (Int) -> Unit,
     finish: () -> Unit,
 ) {
-    val matchDetailViewModel: MatchDetailViewModel = hiltViewModel()
+
     val finishRef by rememberUpdatedState(newValue = finish)
 
     var dialogState by remember {
@@ -61,16 +52,6 @@ fun MatchDetailViewScreen(
     }
     val coroutineScope = rememberCoroutineScope()
 
-    @Composable
-    fun <T> Flow<T>.collectAsEffect(
-        context: CoroutineContext = EmptyCoroutineContext,
-        block: (T) -> Unit
-    ) {
-        DisposableEffect(key1 = matchDetailViewModel.effects, key2 = LocalLifecycleOwner.current) {
-            val job = onEach(block).flowOn(context).launchIn(coroutineScope)
-            onDispose { job.cancel() }
-        }
-    }
 
     fun MatchDetailsEffect.consume(): Any =
         when (this) {
@@ -81,18 +62,15 @@ fun MatchDetailViewScreen(
             is MatchDetailsEffect.CheckPlayerDetails ->
                 onPlayerSelected(playerId)
 
-            is MatchDetailsEffect.Ready -> {
-                this@consume.triggerFetch(matchId)
-            }
-
-
         }
 
-
     val state = matchDetailViewModel.viewState.collectAsState(MatchViewState.initial).value
-    matchDetailViewModel.effects.collectAsEffect(context = Dispatchers.Main, block = {
-        it.forEach(MatchDetailsEffect::consume)
-    })
+    matchDetailViewModel.effects.collectAsEffect(
+        coroutineScope = coroutineScope,
+        context = Dispatchers.Main,
+        block = {
+            it.forEach(MatchDetailsEffect::consume)
+        })
 
     if (state.showLoading) {
         LoadingScreen(Modifier.fillMaxSize())
@@ -120,19 +98,10 @@ fun MatchDetailViewScreen(
     }
     BackHandler {
         dialogState = true
-
-        Log.d("Indivar", "Back button Pressed^^^^^^^^^^^")
     }
 }
 
-@Composable
-fun LoadingScreen(
-    modifier: Modifier = Modifier,
-) {
-    Box(modifier = modifier, contentAlignment = Alignment.Center) {
-        CircularProgressIndicator()
-    }
-}
+
 
 
 @Composable
