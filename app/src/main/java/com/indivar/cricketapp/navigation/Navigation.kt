@@ -21,7 +21,6 @@ import com.indivar.cricketapp.utils.activity
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
-
 sealed class Screen(val route: String) {
 
     object MatchDetailScreen : Screen(route = "match_detail/{matchId}")
@@ -33,7 +32,6 @@ sealed class Screen(val route: String) {
 
 @Composable
 fun Navigation(navigator: Navigator) {
-
     val navigationController = rememberNavController()
     val activity by rememberUpdatedState(newValue = LocalContext.current)
     LaunchedEffect(key1 = "Navigation") {
@@ -98,7 +96,7 @@ fun NavGraphBuilder.SeriesGraph() {
                 }
             ),
 
-        ) {
+            ) {
 
             SeriesDetailViewScreen(
 

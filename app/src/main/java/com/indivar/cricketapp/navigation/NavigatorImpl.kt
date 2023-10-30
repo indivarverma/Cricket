@@ -1,17 +1,18 @@
 package com.indivar.cricketapp.navigation
 
 import android.util.Log
+import com.indivar.core.Base64Encoder
 import com.indivar.core.Navigator
 import com.indivar.models.series.SeriesGroup
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
+import dagger.hilt.android.scopes.ActivityRetainedScoped
 import kotlinx.coroutines.flow.MutableSharedFlow
 import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
+@ActivityRetainedScoped
 class NavigatorImpl @Inject constructor(
-    private val encoder: Base64EncoderImpl,
+    private val encoder: Base64Encoder,
 ) : Navigator {
     override val sharedFlow: MutableSharedFlow<String> = MutableSharedFlow()
     private val moshi by lazy {

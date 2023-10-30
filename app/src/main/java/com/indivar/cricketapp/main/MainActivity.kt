@@ -10,12 +10,12 @@ import androidx.compose.ui.Modifier
 import com.indivar.cricketapp.navigation.Navigation
 import com.indivar.core.Navigator
 import com.indivar.cricketapp.ui.theme.CricketAppTheme
+import dagger.Binds
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-
     @Inject
     lateinit var navigator: Navigator
     override fun onCreate(savedInstanceState: Bundle?) {
