@@ -3,9 +3,12 @@ package com.indivar.core.series.list.domain.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.indivar.core.Navigator
 import com.indivar.core.data.Response
 import com.indivar.core.series.list.domain.usecase.PullAllSeriesUseCase
 import com.indivar.models.series.AllSeries
+import com.indivar.models.series.Series
+import com.indivar.models.series.SeriesGroup
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -20,6 +23,7 @@ import javax.inject.Inject
 class SeriesListViewModel
 @Inject constructor(
     private val useCase: PullAllSeriesUseCase,
+    private val navigator: Navigator,
 ) : ViewModel() {
 
     private val _state =
@@ -53,6 +57,12 @@ class SeriesListViewModel
         }
     }
 
+    private fun onSeriesItemClicked(seriesGroup: SeriesGroup) {
+        viewModelScope.launch {
+            navigator.navigateToSeries(seriesGroup)
+        }
+    }
+
     private fun mapState(state: SeriesListDataState): SeriesListViewState =
         when (val data = state.data) {
             is PullState.Pulled -> SeriesListViewState(
@@ -60,12 +70,14 @@ class SeriesListViewModel
                 showError = false,
                 showLoading = false,
                 refetch = ::reFetch,
+                onSeriesItemClicked = ::onSeriesItemClicked,
             )
 
             is PullState.Failed -> SeriesListViewState(
                 allSeries = null,
                 showError = true,
                 showLoading = false,
+                onSeriesItemClicked = ::onSeriesItemClicked,
                 refetch = ::reFetch,
             )
 
@@ -73,6 +85,7 @@ class SeriesListViewModel
                 showLoading = true,
                 showError = false,
                 allSeries = null,
+                onSeriesItemClicked = ::onSeriesItemClicked,
                 refetch = ::reFetch
             )
         }

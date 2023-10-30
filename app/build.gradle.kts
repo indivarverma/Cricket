@@ -89,4 +89,5 @@ dependencies {
     releaseImplementation ("com.facebook.flipper:flipper-noop:0.233.0")
     debugImplementation("com.facebook.soloader:soloader:0.10.5")
     debugImplementation("com.facebook.flipper:flipper-network-plugin:0.233.0")
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
 }

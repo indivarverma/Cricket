@@ -1,35 +1,55 @@
-package com.indivar.cricketapp.ui.navigation
+package com.indivar.cricketapp.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.platform.LocalContext
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.indivar.cricketapp.match.detail.ui.MatchDetailViewScreen
-import com.indivar.cricketapp.series.list.ui.SeriesListViewScreen
+import androidx.navigation.navigation
+import com.indivar.core.Navigator
+import com.indivar.cricketapp.ui.match.detail.ui.MatchDetailViewScreen
+import com.indivar.cricketapp.ui.series.detail.SeriesDetailViewScreen
+import com.indivar.cricketapp.ui.series.list.ui.SeriesListViewScreen
 import com.indivar.cricketapp.utils.activity
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 
 
 sealed class Screen(val route: String) {
 
     object MatchDetailScreen : Screen(route = "match_detail/{matchId}")
     object SeriesListScreen : Screen(route = "series_list")
+    object SeriesGroupDetailScreen : Screen(route = "series_group/{series_group_data}")
+    object StartScreen : Screen(route = "start")
 }
 
 
 @Composable
-fun Navigation() {
+fun Navigation(navigator: Navigator) {
+
     val navigationController = rememberNavController()
     val activity by rememberUpdatedState(newValue = LocalContext.current)
+    LaunchedEffect(key1 = "Navigation") {
+        navigator.sharedFlow.onEach {
+            navigationController.navigate(it) {
+                popUpTo(it)
+            }
+        }.launchIn(this)
+    }
     NavHost(
         navController = navigationController,
-        startDestination = Screen.SeriesListScreen.route
+        startDestination = Screen.StartScreen.route
     ) {
+
+
+        SeriesGraph()
         composable(
             route = Screen.MatchDetailScreen.route,
             arguments = listOf(
@@ -52,7 +72,14 @@ fun Navigation() {
                 },
             )
         }
+    }
+}
 
+fun NavGraphBuilder.SeriesGraph() {
+    navigation(
+        startDestination = Screen.SeriesListScreen.route,
+        route = Screen.StartScreen.route
+    ) {
         composable(
             route = Screen.SeriesListScreen.route,
 
@@ -60,6 +87,21 @@ fun Navigation() {
 
             SeriesListViewScreen(
                 viewModel = hiltViewModel(),
+            )
+
+        }
+        composable(
+            route = Screen.SeriesGroupDetailScreen.route,
+            arguments = listOf(
+                navArgument("series_group_data") {
+                    type = NavType.StringType
+                }
+            ),
+
+        ) {
+
+            SeriesDetailViewScreen(
+
             )
 
         }

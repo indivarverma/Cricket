@@ -33,7 +33,7 @@ class MatchDetailViewModelTest {
 
     @ExperimentalCoroutinesApi
     @get:Rule
-    var mainCoroutineRule = MainCoroutineRule(/*dispatcher = UnconfinedTestDispatcher()*/)
+    var mainCoroutineRule = MainCoroutineRule()
 
     @Before
     fun init() {

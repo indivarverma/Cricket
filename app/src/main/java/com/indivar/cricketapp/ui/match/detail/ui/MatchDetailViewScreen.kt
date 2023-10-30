@@ -1,4 +1,4 @@
-package com.indivar.cricketapp.match.detail.ui
+package com.indivar.cricketapp.ui.match.detail.ui
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.fillMaxSize
@@ -18,7 +18,7 @@ import com.indivar.core.match.detail.domain.viewmodel.MatchDetailViewModel
 import com.indivar.core.match.detail.domain.viewmodel.MatchDetailsEffect
 import com.indivar.core.match.detail.domain.viewmodel.MatchViewState
 import com.indivar.cricketapp.collectAsEffect
-import com.indivar.cricketapp.ui.composable.LoadingScreen
+import com.indivar.cricketapp.ui.common.LoadingScreen
 import kotlinx.coroutines.Dispatchers
 
 @Composable

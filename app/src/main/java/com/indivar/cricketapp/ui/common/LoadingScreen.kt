@@ -1,4 +1,4 @@
-package com.indivar.cricketapp.ui.composable
+package com.indivar.cricketapp.ui.common
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.CircularProgressIndicator

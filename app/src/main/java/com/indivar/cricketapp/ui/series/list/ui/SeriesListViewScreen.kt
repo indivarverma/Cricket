@@ -1,5 +1,6 @@
-package com.indivar.cricketapp.series.list.ui
+package com.indivar.cricketapp.ui.series.list.ui
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -19,13 +20,14 @@ import com.indivar.core.series.list.domain.viewmodel.SeriesListEffect
 import com.indivar.core.series.list.domain.viewmodel.SeriesListViewModel
 import com.indivar.core.series.list.domain.viewmodel.SeriesListViewState
 import com.indivar.cricketapp.collectAsEffect
-import com.indivar.cricketapp.ui.composable.LoadingScreen
+import com.indivar.cricketapp.ui.common.LoadingScreen
 import com.indivar.models.series.AllSeries
+import com.indivar.models.series.SeriesGroup
 import kotlinx.coroutines.Dispatchers
 
 @Composable
 fun SeriesListViewScreen(
-    viewModel: SeriesListViewModel
+    viewModel: SeriesListViewModel,
 ) {
     var dialogState by remember {
         mutableStateOf(false)
@@ -56,7 +58,7 @@ fun SeriesListViewScreen(
         Text("Encountered Error")
     }
     state.allSeries?.let {
-        AllSeriesView(it)
+        AllSeriesView(it, state.onSeriesItemClicked)
     }
     if (dialogState) {
         AlertDialog(
@@ -74,6 +76,7 @@ fun SeriesListViewScreen(
 @Composable
 fun AllSeriesView(
     data: AllSeries,
+    onItemClick: (SeriesGroup) -> Unit,
 ) {
     LazyColumn {
         item(data.title) {
@@ -91,7 +94,10 @@ fun AllSeriesView(
         items(items = data.seriesGroup, key = { it.type }) { seriesGroup ->
             Text(
                 text = seriesGroup.type,
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.clickable {
+                    onItemClick.invoke(seriesGroup)
+                }
             )
         }
     }

@@ -1,4 +1,4 @@
-package com.indivar.cricketapp.match.detail.ui
+package com.indivar.cricketapp.ui.match.detail.ui
 
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.lazy.LazyColumn

@@ -1,4 +1,4 @@
-package com.indivar.cricketapp.match.detail.ui
+package com.indivar.cricketapp.ui.match.detail.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
