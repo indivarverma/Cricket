@@ -26,18 +26,18 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.indivar.core.series.list.domain.viewmodel.SeriesListEffect
-import com.indivar.core.series.list.domain.viewmodel.SeriesListViewModel
-import com.indivar.core.series.list.domain.viewmodel.SeriesListViewState
+import com.indivar.core.series.groups.domain.viewmodel.SeriesGroupsEffect
+import com.indivar.core.series.groups.domain.viewmodel.SeriesGroupsViewModel
+import com.indivar.core.series.groups.domain.viewmodel.SeriesGroupsViewState
 import com.indivar.cricketapp.collectAsEffect
 import com.indivar.cricketapp.ui.common.LoadingScreen
-import com.indivar.models.series.AllSeries
+import com.indivar.models.series.SeriesGroups
 import com.indivar.models.series.SeriesGroup
 import kotlinx.coroutines.Dispatchers
 
 @Composable
-fun SeriesListViewScreen(
-    viewModel: SeriesListViewModel,
+fun SeriesGroupsViewScreen(
+    viewModel: SeriesGroupsViewModel,
 ) {
     var dialogState by remember {
         mutableStateOf(false)
@@ -45,19 +45,19 @@ fun SeriesListViewScreen(
 
     val coroutineScope = rememberCoroutineScope()
 
-    fun SeriesListEffect.consume() {
+    fun SeriesGroupsEffect.consume() {
         when (this) {
-            is SeriesListEffect.ToastNow -> {
+            is SeriesGroupsEffect.ToastNow -> {
                 dialogState = true
             }
         }
     }
 
-    val state = viewModel.state.collectAsState(SeriesListViewState.initial).value
+    val state = viewModel.state.collectAsState(SeriesGroupsViewState.initial).value
     viewModel.effects.collectAsEffect(
         coroutineScope = coroutineScope,
         context = Dispatchers.Main,
-        block = SeriesListEffect::consume
+        block = SeriesGroupsEffect::consume
     )
 
     if (state.showLoading) {
@@ -66,7 +66,7 @@ fun SeriesListViewScreen(
     if (state.showError) {
         Text("Encountered Error")
     }
-    state.allSeries?.let {
+    state.seriesGroups?.let {
         AllSeriesView(it, state.onSeriesItemClicked)
     }
     if (dialogState) {
@@ -85,7 +85,7 @@ fun SeriesListViewScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AllSeriesView(
-    data: AllSeries,
+    data: SeriesGroups,
     onItemClick: (SeriesGroup) -> Unit,
 ) {
     Scaffold(

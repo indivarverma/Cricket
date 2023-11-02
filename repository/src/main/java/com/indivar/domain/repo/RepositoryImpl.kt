@@ -19,7 +19,7 @@ import com.indivar.models.match.MatchDates
 import com.indivar.models.match.MatchOfficials
 import com.indivar.models.match.Overs
 import com.indivar.models.match.ScoreCard
-import com.indivar.models.series.AllSeries
+import com.indivar.models.series.SeriesGroups
 import com.indivar.models.series.Series
 import com.indivar.models.series.SeriesGroup
 import kotlinx.coroutines.CoroutineDispatcher
@@ -44,19 +44,19 @@ class RepositoryImpl @Inject constructor(
 
     }
 
-    override suspend fun getAllSeries(): AllSeries? {
+    override suspend fun getSeriesGroups(): SeriesGroups? {
         return withContext(defaultDispatcher) {
             withTimeoutOrNull(20000) {
                 val v = networkApi.getAllSeries()
-                v.allSeries
+                v.seriesGroups
             }
         }
     }
 }
 
 
-val AllSeriesDetail.allSeries: AllSeries
-    get() = AllSeries(
+val AllSeriesDetail.seriesGroups: SeriesGroups
+    get() = SeriesGroups(
         title = this.meta.title,
         description = this.meta.description,
         seriesGroup = this.results.map { it.seriesGroup }

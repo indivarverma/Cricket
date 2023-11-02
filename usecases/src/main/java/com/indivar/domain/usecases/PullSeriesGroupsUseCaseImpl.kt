@@ -1,20 +1,20 @@
 package com.indivar.domain.usecases
 
 import com.indivar.core.data.Response
-import com.indivar.core.series.list.domain.usecase.PullAllSeriesUseCase
+import com.indivar.core.series.groups.domain.usecase.PullSeriesGroupsUseCase
 import com.indivar.domain.repo.Repository
-import com.indivar.models.series.AllSeries
+import com.indivar.models.series.SeriesGroups
 import kotlinx.coroutines.coroutineScope
 import javax.inject.Inject
 
-class PullAllSeriesUseCaseImpl @Inject constructor(
+class PullSeriesGroupsUseCaseImpl @Inject constructor(
     private val networkRepository: Repository
-) : PullAllSeriesUseCase {
+) : PullSeriesGroupsUseCase {
     override suspend fun trigger(
 
-    ): Response<AllSeries> = coroutineScope {
+    ): Response<SeriesGroups> = coroutineScope {
         try {
-            networkRepository.getAllSeries()?.let {
+            networkRepository.getSeriesGroups()?.let {
                 Response.Success(it)
             } ?: Response.Error(404, "Empty response")
         } catch (e: Throwable) {

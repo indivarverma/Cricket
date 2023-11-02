@@ -16,7 +16,7 @@ import androidx.navigation.navigation
 import com.indivar.core.Navigator
 import com.indivar.cricketapp.ui.match.detail.ui.MatchDetailViewScreen
 import com.indivar.cricketapp.ui.series.detail.SeriesDetailViewScreen
-import com.indivar.cricketapp.ui.series.list.ui.SeriesListViewScreen
+import com.indivar.cricketapp.ui.series.list.ui.SeriesGroupsViewScreen
 import com.indivar.cricketapp.utils.activity
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -24,7 +24,7 @@ import kotlinx.coroutines.flow.onEach
 sealed class Screen(val route: String) {
 
     object MatchDetailScreen : Screen(route = "match_detail/{matchId}")
-    object SeriesListScreen : Screen(route = "series_list")
+    object SeriesGroupsScreen : Screen(route = "series_list")
     object SeriesGroupDetailScreen : Screen(route = "series_group/{series_group_data}")
     object SeriesFixturesListScreen : Screen(route = "series_fixtures/{series_id}")
     object StartScreen : Screen(route = "start")
@@ -76,15 +76,15 @@ fun Navigation(navigator: Navigator) {
 
 fun NavGraphBuilder.SeriesGraph() {
     navigation(
-        startDestination = Screen.SeriesListScreen.route,
+        startDestination = Screen.SeriesGroupsScreen.route,
         route = Screen.StartScreen.route
     ) {
         composable(
-            route = Screen.SeriesListScreen.route,
+            route = Screen.SeriesGroupsScreen.route,
 
             ) {
 
-            SeriesListViewScreen(
+            SeriesGroupsViewScreen(
                 viewModel = hiltViewModel(),
             )
 

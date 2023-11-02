@@ -1,26 +1,26 @@
-package com.indivar.core.series.list.domain.viewmodel
+package com.indivar.core.series.groups.domain.viewmodel
 
 
 import androidx.lifecycle.viewModelScope
 import com.indivar.core.Navigator
 import com.indivar.core.common.domain.viewmodel.MviViewModel
 import com.indivar.core.data.Response
-import com.indivar.core.series.list.domain.usecase.PullAllSeriesUseCase
-import com.indivar.models.series.AllSeries
+import com.indivar.core.series.groups.domain.usecase.PullSeriesGroupsUseCase
+import com.indivar.models.series.SeriesGroups
 import com.indivar.models.series.SeriesGroup
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class SeriesListViewModel
+class SeriesGroupsViewModel
 @Inject constructor(
-    private val useCase: PullAllSeriesUseCase,
+    private val useCase: PullSeriesGroupsUseCase,
     private val navigator: Navigator,
-) : MviViewModel<SeriesListViewState, SeriesListViewModel.SeriesListDataState, SeriesListEffect>() {
+) : MviViewModel<SeriesGroupsViewState, SeriesGroupsViewModel.SeriesGroupsDataState, SeriesGroupsEffect>() {
 
-    override val initialState: SeriesListDataState
-        get() = SeriesListDataState(data = PullState.Loading)
+    override val initialState: SeriesGroupsDataState
+        get() = SeriesGroupsDataState(data = PullState.Loading)
 
 
     init {
@@ -57,41 +57,41 @@ class SeriesListViewModel
         }
     }
 
-    override fun mapState(state: SeriesListDataState): SeriesListViewState =
+    override fun mapState(state: SeriesGroupsDataState): SeriesGroupsViewState =
         when (val data = state.data) {
-            is PullState.Pulled -> SeriesListViewState(
-                allSeries = data.allSeries,
+            is PullState.Pulled -> SeriesGroupsViewState(
+                seriesGroups = data.seriesGroups,
                 showError = false,
                 showLoading = false,
                 refetch = ::reFetch,
                 onSeriesItemClicked = ::onSeriesItemClicked,
             )
 
-            is PullState.Failed -> SeriesListViewState(
-                allSeries = null,
+            is PullState.Failed -> SeriesGroupsViewState(
+                seriesGroups = null,
                 showError = true,
                 showLoading = false,
                 onSeriesItemClicked = ::onSeriesItemClicked,
                 refetch = ::reFetch,
             )
 
-            is PullState.Loading -> SeriesListViewState(
+            is PullState.Loading -> SeriesGroupsViewState(
                 showLoading = true,
                 showError = false,
-                allSeries = null,
+                seriesGroups = null,
                 onSeriesItemClicked = ::onSeriesItemClicked,
                 refetch = ::reFetch
             )
         }
 
 
-    data class SeriesListDataState(
+    data class SeriesGroupsDataState(
         val data: PullState,
     )
 
     sealed class PullState {
         object Loading : PullState()
-        data class Pulled(val allSeries: AllSeries) : PullState()
+        data class Pulled(val seriesGroups: SeriesGroups) : PullState()
 
         object Failed : PullState()
     }
