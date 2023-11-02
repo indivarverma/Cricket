@@ -1,6 +1,6 @@
 package com.indivar.repository
 
-import com.indivar.domain.repo.match.details.Fixture
+import com.indivar.domain.repo.match.details.ResultFixture
 import com.indivar.domain.repo.match.details.LiveDetails
 import com.indivar.domain.repo.match.details.MatchDetail
 import com.indivar.domain.repo.match.details.MatchSummary
@@ -12,7 +12,7 @@ object FakeData {
 
     val fakeMatchDetail1 = MatchDetail(
         results = Results(
-            fixture = Fixture(
+            fixture = ResultFixture(
                 id = 1002,
                 series_id = 21223,
                 match_title = "Australia vs New Zealand",

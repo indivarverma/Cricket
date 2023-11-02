@@ -1,11 +1,13 @@
 package com.indivar.domain.di
 
+import com.indivar.core.fixtures.list.domain.usecase.PullSeriesFixturesUseCase
 import com.indivar.core.match.detail.domain.usecase.PullMatchDetailsUseCase
 import com.indivar.core.series.detail.domain.usecase.GetSeriesGroupUseCase
 import com.indivar.core.series.groups.domain.usecase.PullSeriesGroupsUseCase
 import com.indivar.domain.usecases.GetSeriesGroupUseCaseImpl
 import com.indivar.domain.usecases.PullSeriesGroupsUseCaseImpl
 import com.indivar.domain.usecases.PullMatchDetailsUseCaseImpl
+import com.indivar.domain.usecases.PullSeriesFixturesUseCaseImpl
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -22,4 +24,7 @@ interface UseCaseProvider {
 
     @Binds
     fun createGetSeriesGroupUseCase(useCaseImpl: GetSeriesGroupUseCaseImpl): GetSeriesGroupUseCase
+
+    @Binds
+    fun createPullSeriesFixturesUseCase(useCaseImpl : PullSeriesFixturesUseCaseImpl): PullSeriesFixturesUseCase
 }

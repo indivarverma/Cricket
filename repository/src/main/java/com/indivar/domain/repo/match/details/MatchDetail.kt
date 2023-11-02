@@ -9,13 +9,13 @@ data class MatchDetail(
 )
 
 data class Results(
-    val fixture: Fixture,
+    val fixture: ResultFixture,
     @Json(name = "live_details")
     val liveDetails: LiveDetails?,
 
     )
 
-data class Fixture(
+data class ResultFixture(
     val id: Int,
     val series_id: Int,
     val match_title: String,

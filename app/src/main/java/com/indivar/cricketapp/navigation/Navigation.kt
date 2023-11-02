@@ -14,6 +14,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import androidx.navigation.navigation
 import com.indivar.core.Navigator
+import com.indivar.cricketapp.ui.fixtures.list.SeriesFixturesListView
 import com.indivar.cricketapp.ui.match.detail.ui.MatchDetailViewScreen
 import com.indivar.cricketapp.ui.series.detail.SeriesDetailViewScreen
 import com.indivar.cricketapp.ui.series.list.ui.SeriesGroupsViewScreen
@@ -113,7 +114,9 @@ fun NavGraphBuilder.SeriesGraph() {
             ),
 
             ) {
-
+                SeriesFixturesListView(
+                    hiltViewModel()
+                )
 
         }
     }

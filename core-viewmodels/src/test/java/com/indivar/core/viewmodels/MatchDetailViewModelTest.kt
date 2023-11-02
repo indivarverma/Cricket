@@ -2,7 +2,7 @@ package com.indivar.core.viewmodels
 
 import androidx.lifecycle.SavedStateHandle
 import com.indivar.core.MainCoroutineRule
-import com.indivar.core.data.Response
+import com.indivar.common.data.Response
 import com.indivar.core.match.detail.domain.usecase.PullMatchDetailsUseCase
 import com.indivar.core.match.detail.domain.viewmodel.MatchDetailViewModel
 import com.indivar.core.match.detail.domain.viewmodel.MatchInformation
@@ -37,7 +37,7 @@ class MatchDetailViewModelTest {
 
     @Before
     fun init() {
-        val match: Response<Match> = Response.Success<Match>(
+        val match: com.indivar.common.data.Response<Match> = com.indivar.common.data.Response.Success<Match>(
             data = Match(
                 id = 100,
                 seriesId = 1001,

@@ -1,13 +1,17 @@
 package com.indivar.domain.repo
 
 import com.indivar.common.api.NetworkApi
+import com.indivar.core.data.Response
 import com.indivar.domain.repo.match.details.MatchDetail
 import com.indivar.domain.repo.match.details.MatchInning
 import com.indivar.domain.repo.match.details.Officials
 import com.indivar.domain.repo.match.details.Team
+import com.indivar.domain.repo.series.fixtures.FixtureItem
+import com.indivar.domain.repo.series.fixtures.FixturesForSeries
 import com.indivar.domain.repo.series.list.AllSeriesDetail
 import com.indivar.domain.repo.series.list.SeriesItem
 import com.indivar.domain.repo.series.list.SeriesSet
+import com.indivar.domain.usecases.DetailedServerError
 import com.indivar.models.Boundary
 import com.indivar.models.BoundaryType
 import com.indivar.models.Player
@@ -19,9 +23,11 @@ import com.indivar.models.match.MatchDates
 import com.indivar.models.match.MatchOfficials
 import com.indivar.models.match.Overs
 import com.indivar.models.match.ScoreCard
-import com.indivar.models.series.SeriesGroups
+import com.indivar.models.series.Fixture
 import com.indivar.models.series.Series
+import com.indivar.models.series.SeriesFixtures
 import com.indivar.models.series.SeriesGroup
+import com.indivar.models.series.SeriesGroups
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
@@ -29,31 +35,67 @@ import kotlinx.coroutines.withTimeoutOrNull
 import javax.inject.Inject
 import com.indivar.models.Team as ModelsTeam
 
-
 class RepositoryImpl @Inject constructor(
     private val networkApi: NetworkApi,
     private val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default
 ) : Repository {
-    override suspend fun pullMatchDetails(matchId: Int): Match? {
-        return withContext(defaultDispatcher) {
-            withTimeoutOrNull(5000) {
-                val v = networkApi.getMatchDetails(matchId)
-                v.match
-            }
-        }
-
+    override suspend fun pullMatchDetails(matchId: Int): Response<Match> = makeRequest {
+        requireNotNull(networkApi.getMatchDetails(matchId).match)
     }
 
-    override suspend fun getSeriesGroups(): SeriesGroups? {
+    override suspend fun getSeriesGroups(): Response<SeriesGroups> = makeRequest {
+        val v = networkApi.getAllSeries()
+        v.seriesGroups
+    }
+
+    private suspend fun <T> makeRequest(requestBlock: suspend () -> T): Response<T> {
         return withContext(defaultDispatcher) {
             withTimeoutOrNull(20000) {
-                val v = networkApi.getAllSeries()
-                v.seriesGroups
-            }
+                try {
+                    Response.Success(requestBlock())
+                } catch (e: DetailedServerError) {
+                    Response.Error(
+                        e.errorCode,
+                        e.errorMessage
+                    )
+                } catch (e: Exception) {
+                    Response.Error(
+                        1000,
+                        e.message ?: "Unknown Error"
+                    )
+                }
+            } ?: Response.Error(
+                1000,
+                "Request Timed Out"
+            )
         }
     }
+
+    override suspend fun fetchSeriesFixtures(seriesId: Int): Response<SeriesFixtures> =
+        makeRequest<SeriesFixtures> {
+            val fixtures = networkApi.getSeriesFixtures(seriesId)
+            fixtures.seriesFixtures
+        }
+
 }
 
+val FixturesForSeries.seriesFixtures: SeriesFixtures
+    get() = SeriesFixtures(
+        fixtures = this.results.map(FixtureItem::fixture)
+    )
+
+val FixtureItem.fixture: Fixture
+    get() = Fixture(
+        id = id,
+        seriesId = seriesId,
+        title = title,
+        subtitle = subtitle,
+        home = home.team,
+        away = away.team,
+        status = status,
+        venue = venue,
+        result = result,
+    )
 
 val AllSeriesDetail.seriesGroups: SeriesGroups
     get() = SeriesGroups(

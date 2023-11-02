@@ -6,8 +6,8 @@ import com.indivar.core.Navigator
 import com.indivar.core.common.domain.viewmodel.MviViewModel
 import com.indivar.core.data.Response
 import com.indivar.core.series.groups.domain.usecase.PullSeriesGroupsUseCase
-import com.indivar.models.series.SeriesGroups
 import com.indivar.models.series.SeriesGroup
+import com.indivar.models.series.SeriesGroups
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import javax.inject.Inject
