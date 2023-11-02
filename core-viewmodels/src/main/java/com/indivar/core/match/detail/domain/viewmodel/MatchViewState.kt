@@ -6,7 +6,7 @@ data class MatchViewState(
     val showLoading: Boolean,
     val showError: Boolean,
     val info: MatchInformation?,
-    val refetch: suspend () -> Unit,
+    val refetch: () -> Unit,
 ) {
     companion object {
         val initial = MatchViewState(

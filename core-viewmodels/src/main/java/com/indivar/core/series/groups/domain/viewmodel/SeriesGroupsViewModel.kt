@@ -27,12 +27,6 @@ class SeriesGroupsViewModel
         fetch()
     }
 
-
-    private suspend fun reFetch() {
-        fetch()
-    }
-
-
     private fun fetch(onSuccess: () -> Unit = {}) {
         viewModelScope.launch {
             val allSeriesResponse = useCase.trigger()
@@ -63,7 +57,7 @@ class SeriesGroupsViewModel
                 seriesGroups = data.seriesGroups,
                 showError = false,
                 showLoading = false,
-                refetch = ::reFetch,
+                refetch = ::fetch,
                 onSeriesItemClicked = ::onSeriesItemClicked,
             )
 
@@ -72,7 +66,7 @@ class SeriesGroupsViewModel
                 showError = true,
                 showLoading = false,
                 onSeriesItemClicked = ::onSeriesItemClicked,
-                refetch = ::reFetch,
+                refetch = ::fetch,
             )
 
             is PullState.Loading -> SeriesGroupsViewState(
@@ -80,7 +74,7 @@ class SeriesGroupsViewModel
                 showError = false,
                 seriesGroups = null,
                 onSeriesItemClicked = ::onSeriesItemClicked,
-                refetch = ::reFetch
+                refetch = ::fetch
             )
         }
 

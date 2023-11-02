@@ -47,13 +47,12 @@ fun MatchDetailViewScreen(
 
         }
 
-    val state = matchDetailViewModel.viewState.collectAsState(MatchViewState.initial).value
+    val state = matchDetailViewModel.state.collectAsState(MatchViewState.initial).value
     matchDetailViewModel.effects.collectAsEffect(
         coroutineScope = coroutineScope,
         context = Dispatchers.Main,
-        block = {
-            it.forEach(MatchDetailsEffect::consume)
-        })
+        block = MatchDetailsEffect::consume
+    )
 
     if (state.showLoading) {
         LoadingScreen(Modifier.fillMaxSize())

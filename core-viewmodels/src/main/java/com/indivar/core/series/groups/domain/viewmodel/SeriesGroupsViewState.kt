@@ -9,7 +9,7 @@ data class SeriesGroupsViewState(
     val showError: Boolean,
     val showLoading: Boolean,
     val onSeriesItemClicked: (SeriesGroup) -> Unit,
-    val refetch: suspend () -> Unit,
+    val refetch: () -> Unit,
 ) {
     companion object {
         val initial = SeriesGroupsViewState(
