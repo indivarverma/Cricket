@@ -3,21 +3,26 @@ package com.indivar.repository
 import com.indivar.common.api.NetworkApi
 import com.indivar.domain.repo.RepositoryImpl
 import com.indivar.domain.repo.match.details.MatchDetail
+import com.indivar.models.match.Match
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.StandardTestDispatcher
+import kotlinx.coroutines.test.TestCoroutineScheduler
 import kotlinx.coroutines.test.TestDispatcher
+import kotlinx.coroutines.test.TestScope
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
 import kotlinx.coroutines.test.setMain
-import kotlinx.coroutines.withContext
 import org.junit.Assert
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.TestWatcher
 import org.junit.runner.Description
@@ -30,9 +35,9 @@ import org.junit.runner.Description
 class RepositoryImplTest {
     private lateinit var networkApi: NetworkApi
     private lateinit var matchDetail: MatchDetail
-    @ExperimentalCoroutinesApi
-    @get:Rule
-    var mainCoroutineRule = MainCoroutineRule()
+    /*@ExperimentalCoroutinesApi*/
+    /*@get:Rule
+    var mainCoroutineRule = MainCoroutineRule()*/
 
     @Before
     fun init() {
@@ -65,29 +70,31 @@ class RepositoryImplTest {
 
         }
     }
+
     @Test
     fun `verify Match object is not pulled on delay`() {
-        runTest {
-
+        var match: Match? = null
+        val (scheduler, job) = runEagerly {dispatcher ->
             coEvery { networkApi.getMatchDetails(any()) }.coAnswers {
-                withContext(mainCoroutineRule.dispatcher) {
-                    delay(20000)
-                    matchDetail
-                }
+                delay(6000)
+                matchDetail
             }
             val repository = RepositoryImpl(
                 networkApi,
-                mainCoroutineRule.dispatcher
+                dispatcher
             )
-
-            val match = repository.pullMatchDetails(1002)
-
-            Assert.assertNull(match)
-            coVerify { networkApi.getMatchDetails(1002) }
-
-
+            match = repository.pullMatchDetails(1002)
         }
+
+        Assert.assertNull(match)
+        coVerify { networkApi.getMatchDetails(1002) }
     }
+}
+
+fun runEagerly(code: suspend (CoroutineDispatcher) -> Unit): Pair<TestCoroutineScheduler, Job> {
+    val testDispatcher = UnconfinedTestDispatcher()
+    val job = TestScope(testDispatcher).launch { code(testDispatcher) }
+    return testDispatcher.scheduler to job
 }
 
 @ExperimentalCoroutinesApi

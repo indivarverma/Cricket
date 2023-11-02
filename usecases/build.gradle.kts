@@ -49,4 +49,5 @@ dependencies {
     
     kapt ("androidx.hilt:hilt-compiler:1.1.0-rc01")
     implementation ("androidx.hilt:hilt-navigation-compose:1.1.0-rc01")
+    implementation("com.squareup.moshi:moshi-kotlin:1.15.0")
 }

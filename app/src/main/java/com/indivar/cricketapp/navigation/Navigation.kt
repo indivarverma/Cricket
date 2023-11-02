@@ -26,6 +26,7 @@ sealed class Screen(val route: String) {
     object MatchDetailScreen : Screen(route = "match_detail/{matchId}")
     object SeriesListScreen : Screen(route = "series_list")
     object SeriesGroupDetailScreen : Screen(route = "series_group/{series_group_data}")
+    object SeriesFixturesListScreen : Screen(route = "series_fixtures/{series_id}")
     object StartScreen : Screen(route = "start")
 }
 
@@ -99,8 +100,20 @@ fun NavGraphBuilder.SeriesGraph() {
             ) {
 
             SeriesDetailViewScreen(
-
+                hiltViewModel()
             )
+
+        }
+        composable(
+            route = Screen.SeriesFixturesListScreen.route,
+            arguments = listOf(
+                navArgument("series_id") {
+                    type = NavType.IntType
+                }
+            ),
+
+            ) {
+
 
         }
     }

@@ -1,8 +1,8 @@
 package com.indivar.cricketapp.navigation
 
-import android.util.Log
 import com.indivar.core.Base64Encoder
 import com.indivar.core.Navigator
+import com.indivar.models.series.Series
 import com.indivar.models.series.SeriesGroup
 import com.squareup.moshi.Moshi
 import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
@@ -23,12 +23,18 @@ class NavigatorImpl @Inject constructor(
         sharedFlow.emit(
             Screen.SeriesGroupDetailScreen.route.replace(
                 "{series_group_data}",
-                encoder.encode(moshi.adapter(SeriesGroup::class.java).toJson(seriesGroup)).also {
-                    val x = encoder.decode(it)
-                    Log.d("Indivar", x)
-                }
+                encoder.encode(moshi.adapter(SeriesGroup::class.java).toJson(seriesGroup))
             )
         )
+
+    override suspend fun navigateToSeriesFixtures(series: Series) {
+        sharedFlow.emit(
+            Screen.SeriesFixturesListScreen.route.replace(
+                "{series_id}",
+                series.id.toString()
+            )
+        )
+    }
 
 }
 
