@@ -2,6 +2,7 @@ package com.indivar.cricketapp.navigation
 
 import com.indivar.core.Base64Encoder
 import com.indivar.core.Navigator
+import com.indivar.models.series.Fixture
 import com.indivar.models.series.Series
 import com.indivar.models.series.SeriesGroup
 import com.squareup.moshi.Moshi
@@ -32,6 +33,15 @@ class NavigatorImpl @Inject constructor(
             Screen.SeriesFixturesListScreen.route.replace(
                 "{series_id}",
                 series.id.toString()
+            )
+        )
+    }
+
+    override suspend fun navigateToFixture(fixture: Fixture) {
+        sharedFlow.emit(
+            Screen.MatchDetailScreen.route.replace(
+                "{matchId}",
+                fixture.id.toString()
             )
         )
     }

@@ -1,6 +1,7 @@
 package com.indivar.models.series
 
 import com.indivar.models.Team
+import java.time.ZonedDateTime
 
 data class Fixture(
     val id: Int,
@@ -12,4 +13,5 @@ data class Fixture(
     val seriesId: Int,
     val status: String,
     val venue: String,
+    val date: ZonedDateTime?,
 )

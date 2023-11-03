@@ -2,7 +2,7 @@ package com.indivar.common.api
 
 import com.indivar.domain.repo.match.details.MatchDetail
 import com.indivar.domain.repo.series.fixtures.FixturesForSeries
-import com.indivar.domain.repo.series.list.AllSeriesDetail
+import com.indivar.domain.repo.series.groups.AllSeriesDetail
 import retrofit2.http.GET
 import retrofit2.http.Path
 
@@ -18,7 +18,7 @@ interface NetworkApi {
 
     ): AllSeriesDetail
 
-    @GET("//fixtures-by-series/{seriesId}")
+    @GET("/fixtures-by-series/{seriesId}")
     suspend fun getSeriesFixtures(
         @Path("seriesId") seriesId: Int,
     ): FixturesForSeries

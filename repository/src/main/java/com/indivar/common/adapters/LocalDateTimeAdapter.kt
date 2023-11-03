@@ -8,35 +8,34 @@ import com.squareup.moshi.JsonReader
 import com.squareup.moshi.JsonWriter
 import com.squareup.moshi.ToJson
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
 
 
-data class JsonDateTime(
+data class JsonLocalDateTime(
     val date: String?,
     val time: String?,
-    val timezone: String?,
-)
 
-class ZonedDateTimeAdapter : JsonAdapter<ZonedDateTime>() {
+    )
+
+class LocalDateTimeAdapter : JsonAdapter<LocalDateTime>() {
 
     @FromJson
 
-    override fun fromJson(reader: JsonReader): ZonedDateTime? =
+    override fun fromJson(reader: JsonReader): LocalDateTime? =
         try {
-
             val readValue = reader.nextString()
             try {
                 val jsonDateTime =
-                    Gson().fromJson<JsonDateTime>(readValue, JsonDateTime::class.java)
+                    Gson().fromJson<JsonLocalDateTime>(readValue, JsonLocalDateTime::class.java)
                 val date = LocalDate.parse(jsonDateTime.date)
                 val time = LocalTime.parse(jsonDateTime.time)
-                val timezone = ZoneId.of(jsonDateTime.timezone)
-                ZonedDateTime.of(date, time, timezone)
+
+                LocalDateTime.of(date, time)
             } catch (e: JsonSyntaxException) {
-                ZonedDateTime.parse(readValue)
+                LocalDateTime.parse(readValue)
             }
 
         } catch (e: Exception) {
@@ -44,11 +43,11 @@ class ZonedDateTimeAdapter : JsonAdapter<ZonedDateTime>() {
         }
 
     @ToJson
-    override fun toJson(writer: JsonWriter, input: ZonedDateTime?) {
+    override fun toJson(writer: JsonWriter, input: LocalDateTime?) {
         val date: String = input?.toLocalDate().toString()
         val time: String = input?.toLocalTime().toString()
-        val timezone: String = input?.getZone().toString()
-        writer.value(Gson().toJson(JsonDateTime(date, time, timezone)))
+
+        writer.value(Gson().toJson(JsonLocalDateTime(date, time)))
     }
 
     companion object {

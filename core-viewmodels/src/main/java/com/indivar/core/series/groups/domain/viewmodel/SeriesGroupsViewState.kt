@@ -6,7 +6,7 @@ import com.indivar.models.series.SeriesGroup
 
 data class SeriesGroupsViewState(
     val seriesGroups: SeriesGroups?,
-    val showError: Boolean,
+    val error: ErrorState?,
     val showLoading: Boolean,
     val onSeriesItemClicked: (SeriesGroup) -> Unit,
     val refetch: () -> Unit,
@@ -14,10 +14,16 @@ data class SeriesGroupsViewState(
     companion object {
         val initial = SeriesGroupsViewState(
             seriesGroups = null,
-            showError = false,
+            error = null,
             showLoading = true,
             onSeriesItemClicked = {},
             refetch = {}
         )
     }
 }
+
+
+data class ErrorState(
+    val code: Int,
+    val message: String,
+)

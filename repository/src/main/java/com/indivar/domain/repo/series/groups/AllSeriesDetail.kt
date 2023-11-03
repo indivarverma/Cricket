@@ -1,4 +1,4 @@
-package com.indivar.domain.repo.series.list
+package com.indivar.domain.repo.series.groups
 
 import com.squareup.moshi.Json
 import java.time.ZonedDateTime

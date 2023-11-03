@@ -2,8 +2,10 @@ package com.indivar.domain.repo.series.fixtures
 
 import com.indivar.domain.repo.match.details.Team
 import com.squareup.moshi.Json
+import java.time.LocalDateTime
+import java.time.ZonedDateTime
 
-data class FixturesForSeries (
+data class FixturesForSeries(
     @Json(name = "results")
     val results: List<FixtureItem>
 )
@@ -27,4 +29,6 @@ data class FixtureItem(
     val status: String,
     @Json(name = "venue")
     val venue: String,
+    @Json(name = "date")
+    val date: ZonedDateTime?,
 )

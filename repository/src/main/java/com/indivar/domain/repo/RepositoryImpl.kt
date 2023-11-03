@@ -8,9 +8,9 @@ import com.indivar.domain.repo.match.details.Officials
 import com.indivar.domain.repo.match.details.Team
 import com.indivar.domain.repo.series.fixtures.FixtureItem
 import com.indivar.domain.repo.series.fixtures.FixturesForSeries
-import com.indivar.domain.repo.series.list.AllSeriesDetail
-import com.indivar.domain.repo.series.list.SeriesItem
-import com.indivar.domain.repo.series.list.SeriesSet
+import com.indivar.domain.repo.series.groups.AllSeriesDetail
+import com.indivar.domain.repo.series.groups.SeriesItem
+import com.indivar.domain.repo.series.groups.SeriesSet
 import com.indivar.domain.usecases.DetailedServerError
 import com.indivar.models.Boundary
 import com.indivar.models.BoundaryType
@@ -28,10 +28,14 @@ import com.indivar.models.series.Series
 import com.indivar.models.series.SeriesFixtures
 import com.indivar.models.series.SeriesGroup
 import com.indivar.models.series.SeriesGroups
+import com.squareup.moshi.Moshi
+import com.squareup.moshi.kotlin.reflect.KotlinJsonAdapterFactory
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import retrofit2.HttpException
+import java.io.IOException
 import javax.inject.Inject
 import com.indivar.models.Team as ModelsTeam
 
@@ -53,21 +57,33 @@ class RepositoryImpl @Inject constructor(
             withTimeoutOrNull(20000) {
                 try {
                     Response.Success(requestBlock())
-                } catch (e: DetailedServerError) {
+                } catch (ioException: IOException) {
                     Response.Error(
-                        e.errorCode,
-                        e.errorMessage
+                        1000, ioException.message ?: "Unknown io error"
                     )
-                } catch (e: Exception) {
+                } catch (httpException: HttpException) {
                     Response.Error(
-                        1000,
-                        e.message ?: "Unknown Error"
+                        httpException.code(),
+                        convertErrorBody(httpException)?.message ?: "Unknown http exception"
                     )
                 }
+
             } ?: Response.Error(
                 1000,
                 "Request Timed Out"
             )
+        }
+    }
+
+    private fun convertErrorBody(throwable: HttpException): DetailedServerError? {
+        return try {
+            throwable.response()?.errorBody()?.source()?.let {
+                val moshiAdapter = Moshi.Builder().addLast(KotlinJsonAdapterFactory()).build()
+                    .adapter(DetailedServerError::class.java)
+                moshiAdapter.fromJson(it)
+            }
+        } catch (exception: Exception) {
+            null
         }
     }
 
@@ -95,6 +111,7 @@ val FixtureItem.fixture: Fixture
         status = status,
         venue = venue,
         result = result,
+        date = date,
     )
 
 val AllSeriesDetail.seriesGroups: SeriesGroups

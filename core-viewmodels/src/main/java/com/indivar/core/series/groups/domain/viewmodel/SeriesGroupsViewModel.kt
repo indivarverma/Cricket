@@ -9,6 +9,7 @@ import com.indivar.core.series.groups.domain.usecase.PullSeriesGroupsUseCase
 import com.indivar.models.series.SeriesGroup
 import com.indivar.models.series.SeriesGroups
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -28,7 +29,13 @@ class SeriesGroupsViewModel
     }
 
     private fun fetch(onSuccess: () -> Unit = {}) {
-        viewModelScope.launch {
+        viewModelScope.launch(CoroutineExceptionHandler { _, throwable ->
+            enqueue {
+                copy(
+                    data = PullState.Failed(1002, throwable.message ?: "Unknown")
+                )
+            }
+        }) {
             val allSeriesResponse = useCase.trigger()
             enqueue {
                 copy(
@@ -37,13 +44,18 @@ class SeriesGroupsViewModel
                             onSuccess()
                         }
 
-                        is Response.Error -> PullState.Failed
+                        is Response.Error -> PullState.Failed(
+                            code = allSeriesResponse.errorCode,
+                            message = allSeriesResponse.errorMessage
+                        )
                     }
                 )
             }
 
         }
     }
+
+
 
     private fun onSeriesItemClicked(seriesGroup: SeriesGroup) {
         viewModelScope.launch {
@@ -55,7 +67,7 @@ class SeriesGroupsViewModel
         when (val data = state.data) {
             is PullState.Pulled -> SeriesGroupsViewState(
                 seriesGroups = data.seriesGroups,
-                showError = false,
+                error = null,
                 showLoading = false,
                 refetch = ::fetch,
                 onSeriesItemClicked = ::onSeriesItemClicked,
@@ -63,7 +75,7 @@ class SeriesGroupsViewModel
 
             is PullState.Failed -> SeriesGroupsViewState(
                 seriesGroups = null,
-                showError = true,
+                error = ErrorState(code = data.code, message = data.message),
                 showLoading = false,
                 onSeriesItemClicked = ::onSeriesItemClicked,
                 refetch = ::fetch,
@@ -71,7 +83,7 @@ class SeriesGroupsViewModel
 
             is PullState.Loading -> SeriesGroupsViewState(
                 showLoading = true,
-                showError = false,
+                error = null,
                 seriesGroups = null,
                 onSeriesItemClicked = ::onSeriesItemClicked,
                 refetch = ::fetch
@@ -87,6 +99,9 @@ class SeriesGroupsViewModel
         object Loading : PullState()
         data class Pulled(val seriesGroups: SeriesGroups) : PullState()
 
-        object Failed : PullState()
+        data class Failed(
+            val code: Int,
+            val message: String,
+        ) : PullState()
     }
 }

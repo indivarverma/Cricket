@@ -1,4 +1,4 @@
-package com.indivar.cricketapp.ui.series.list.ui
+package com.indivar.cricketapp.ui.series.groups.ui
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -63,8 +63,8 @@ fun SeriesGroupsViewScreen(
     if (state.showLoading) {
         LoadingScreen(Modifier.fillMaxSize())
     }
-    if (state.showError) {
-        Text("Encountered Error")
+    state.error?.let {
+        Text("Error(${it.code}): ${it.message}")
     }
     state.seriesGroups?.let {
         AllSeriesView(it, state.onSeriesItemClicked)
